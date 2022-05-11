@@ -1,32 +1,43 @@
 import React, { useState } from "react";
-import { getAllDogs } from "./API/services";
+import { getAllDogs, getOneDog } from "./API/services";
 
 function App() {
   const [dogs, setDogs] = useState();
+  const [imgUrl, setImgUrl] = useState("");
 
   function handler() {
     getAllDogs().then((res) => {
-      console.log(res.data);
       setDogs(Object.keys(res.data.message));
     });
   }
 
   function changeHandler(e) {
     console.log(e.target.value);
+    getOneDog(e.target.value)
+      .then((e) => e.json())
+      .then((res) => setImgUrl(res.message));
   }
+  const style = {
+    margin: "auto",
+    width: "100vw",
+    height: "100vh",
+  };
   return (
-    <div>
-      <button onClick={handler}>click me</button>
-      {/* 
-      {dogs &&
-        dogs.map((dogName, index) => {
-          return <h3 key={index}>{dogName}</h3>;
-        })} */}
-      <select onChange={changeHandler}>
-        <option value={"1"}>one</option>
-        <option value={"2"}>two</option>
-        <option value={"3"}>three</option>
-      </select>
+    <div style={style}>
+      {dogs ? (
+        <>
+          <select onChange={changeHandler}>
+            {dogs.map((dog, index) => (
+              <option key={index} value={dog}>
+                {dog}
+              </option>
+            ))}
+          </select>
+          <img src={imgUrl} alt="" />
+        </>
+      ) : (
+        <button onClick={handler}>Fetch</button>
+      )}
     </div>
   );
 }
